@@ -1,4 +1,4 @@
-package boj.boj3055;
+package boj.boj3055탈출;
 
 import java.io.*;
 import java.net.URLDecoder;
