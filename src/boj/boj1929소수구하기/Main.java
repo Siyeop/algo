@@ -1,4 +1,4 @@
-package boj1929소수구하기;
+package boj.boj1929소수구하기;
 
 import java.io.*;
 import java.net.URLDecoder;
