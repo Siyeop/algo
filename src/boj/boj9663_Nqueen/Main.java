@@ -1,9 +1,7 @@
-package boj.boj9663Nqueen;
+package boj.boj9663_Nqueen;
 
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
 
