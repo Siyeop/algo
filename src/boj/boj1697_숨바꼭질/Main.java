@@ -35,19 +35,15 @@ public class Main {
         // 2-3. 수행
         while(!queue.isEmpty()) {
             int polled = queue.poll();
+
             if(visited[K] != UNVISITED && visited[polled] >= visited[K]) break;
 
-            if(polled-1 >= MIN_IDX && visited[polled-1] == UNVISITED) {
-                queue.add(polled-1);
-                visited[polled-1] = visited[polled] + 1;
-            }
-            if(polled+1 <= MAX_IDX && visited[polled+1] == UNVISITED) {
-                queue.add(polled+1);
-                visited[polled+1] = visited[polled] + 1;
-            }
-            if(polled*2 <= MAX_IDX && visited[polled*2] == UNVISITED) {
-                queue.add(polled*2);
-                visited[polled*2] = visited[polled] + 1;
+            int[] nextArr = {polled-1, polled+1, polled*2};
+            for(int next : nextArr) {
+                if(next >= MIN_IDX && next <=MAX_IDX && visited[next] == UNVISITED) {
+                    queue.add(next);
+                    visited[next] = visited[polled] + 1;
+                }
             }
         }
 
