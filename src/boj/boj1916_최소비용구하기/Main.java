@@ -15,24 +15,27 @@ public class Main {
         bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
         // 1. 문제 읽기
-        // 1-1. 기초 정보
-        int N = Integer.parseInt(br.readLine());
-        int M = Integer.parseInt(br.readLine());
+        // 1-1. 기본 정보, 0.5초
+        int N = Integer.parseInt(br.readLine().trim()); // 1 ~ 1,000
+        int M = Integer.parseInt(br.readLine().trim()); // 1 ~ 100,000
 
-        // 1-2. 간선 정보
         Graph graph = new Graph(N);
-        for(int i=1; i<=M; i++) {
-            st = new StringTokenizer(br.readLine());
+
+        // 1-2. 버스 정보
+        for(int i=0; i<M; i++) {
+            st = new StringTokenizer(br.readLine().trim());
             graph.addEdge(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
         }
 
-        // 2. 풀이
-        // 2-1. 다익스트라
-        st = new StringTokenizer(br.readLine());
-        graph.setPoint(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+        // 1-3. 출발 도착점 정보
+        st = new StringTokenizer(br.readLine().trim());
+        int start = Integer.parseInt(st.nextToken());
+        int end = Integer.parseInt(st.nextToken());
 
-        graph.dijkstra();
-        bw.write(graph.getAnswer() + "\n");
+        // 2. 계산
+        graph.dijkstra(start);
+
+        bw.write(graph.cost[end] + "\n");
 
         bw.flush();
         bw.close();
@@ -40,74 +43,69 @@ public class Main {
     }
 }
 
-
 class Graph {
+
     int size;
     List<Edge>[] edgeList;
-    int start;
-    int end;
-    long[] cost;
+    int[] cost;
+    boolean[] visited;
 
     public Graph(int size) {
         this.size = size;
-        edgeList = new ArrayList[size+1];
-        for(int i=0; i<=size; i++) edgeList[i] = new ArrayList<>();
-        cost = new long[size+1];
-        Arrays.fill(cost, Long.MAX_VALUE);
+        this.edgeList = new ArrayList[size+1];
+        for(int i=0; i<=size; i++) {
+            this.edgeList[i] = new ArrayList<>();
+        }
+        this.cost = new int[size+1];
+        this.visited = new boolean[size+1];
     }
 
     public void addEdge(int from, int to, int cost) {
-        edgeList[from].add(new Edge(to, cost));
+        this.edgeList[from].add(new Edge(to, cost));
     }
 
-    public void setPoint(int start, int end) {
-        this.start = start;
-        this.end = end;
-    }
+    public void dijkstra(int start) {
+        PriorityQueue<Node> pq = new PriorityQueue<>((n1, n2) -> n1.cost - n2.cost);
 
-    public void dijkstra() {
-        cost[start] = 0L;
+        Arrays.fill(this.cost, Integer.MAX_VALUE);
+        this.cost[start] = 0;
+        pq.offer(new Node(start, 0));
 
-        Queue<Node> pq = new PriorityQueue<>();
-        pq.add(new Node(start, 0L));
-
-        while(!pq.isEmpty()) {
+        while (!pq.isEmpty()) {
             Node polled = pq.poll();
-            for(Edge edge : edgeList[polled.num]) {
-                if(cost[polled.num] + edge.cost < cost[edge.to]) {
-                    cost[edge.to] = cost[polled.num] + edge.cost;
-                    pq.add(new Node(edge.to, cost[edge.to]));
+            int curr = polled.no;
+
+            if (!this.visited[curr]) {
+                this.visited[curr] = true;
+
+                for (Edge edge : this.edgeList[curr]) {
+                    int nCost = cost[curr] + edge.cost;
+                    if (!this.visited[edge.to] && cost[edge.to] > nCost) {
+                        cost[edge.to] = nCost;
+                        pq.add(new Node(edge.to, cost[edge.to]));
+                    }
                 }
             }
         }
-    }
-
-    public long getAnswer() {
-        return cost[end];
-    }
-}
-
-class Node implements Comparable<Node> {
-    int num;
-    long cost;
-
-    public Node(int num, long cost) {
-        this.num = num;
-        this.cost = cost;
-    }
-
-    @Override
-    public int compareTo(Node o) {
-        return Long.compare(this.cost, o.cost);
     }
 }
 
 class Edge {
     int to;
-    long cost;
+    int cost;
 
-    public Edge(int to, long cost) {
+    public Edge(int to, int cost) {
         this.to = to;
+        this.cost = cost;
+    }
+}
+
+class Node {
+    int no;
+    int cost;
+
+    public Node(int no, int cost) {
+        this.no = no;
         this.cost = cost;
     }
 }
